@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What’s My IP — Rainbow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Decorative background -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Subtle grid -->
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <main class="container">
+    <header class="brand">
+      <div class="logo">🌈</div>
+      <h1 class="title">Your IP</h1>
+    </header>
+
+    <section class="hero-card" role="region" aria-live="polite" aria-atomic="true">
+      <div id="ip" class="ip-text" data-placeholder="Fetching IP…">Fetching IP…</div>
+      <div class="subline">
+        Client-side only • No logging • Smooth as butter
+      </div>
+      <div class="controls">
+        <button id="copyBtn" class="btn" aria-label="Copy IP">Copy</button>
+        <button id="refreshBtn" class="btn ghost" aria-label="Refresh IP">Refresh</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Built with love and tastefully over-engineered animations.</span>
+      <a href="#" id="privacyLink">Privacy</a>
+    </footer>
+  </main>
+
+  <!-- Inline dialog for transparency -->
+  <dialog id="privacyDialog">
+    <h2>Privacy</h2>
+    <p>This page fetches your public IP from a public API and renders it locally in your browser. It does not send your IP anywhere.</p>
+    <form method="dialog">
+      <button class="btn">Close</button>
+    </form>
+  </dialog>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
