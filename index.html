@@ -3,44 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Glowing File Directory</title>
+  <title>Sleek File Directory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
   <style>
-    /* Catppuccin Mocha Palette */
     :root {
       --base: #1e1e2e;
       --mantle: #181825;
       --crust: #11111b;
       --text: #cdd6f4;
-      --subtext: #a6adc8;
       --blue: #89b4fa;
       --lavender: #b4befe;
       --mauve: #cba6f7;
       --pink: #f5c2e7;
       --red: #f38ba8;
-      --green: #a6e3a1;
-      --yellow: #f9e2af;
     }
 
     body {
       background: var(--base);
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Montserrat', sans-serif;
       color: var(--text);
       margin: 0;
       overflow-x: hidden;
       cursor: none;
     }
 
-    /* Glowing Cursor */
+    /* Smooth Cursor */
     .cursor {
       position: fixed;
-      width: 20px;
-      height: 20px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
-      background: var(--mauve);
+      background: var(--lavender);
       box-shadow: 0 0 20px var(--mauve), 0 0 40px var(--pink);
       pointer-events: none;
       transform: translate(-50%, -50%);
-      transition: transform 0.1s ease-out;
+      transition: transform 0.15s cubic-bezier(.25,.8,.25,1);
       z-index: 9999;
     }
 
@@ -48,19 +45,36 @@
       padding: 20px;
       text-align: center;
       font-size: 2em;
+      font-weight: 700;
       color: var(--lavender);
       text-shadow: 0 0 15px var(--mauve);
-      animation: glow 3s ease-in-out infinite alternate;
     }
 
-    @keyframes glow {
-      from { text-shadow: 0 0 10px var(--mauve), 0 0 20px var(--blue); }
-      to { text-shadow: 0 0 20px var(--pink), 0 0 40px var(--lavender); }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+    }
+
+    .search-box input {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: var(--mantle);
+      color: var(--text);
+      font-size: 1em;
+    }
+
+    .file-count {
+      font-size: 0.9em;
+      color: var(--blue);
     }
 
     .directory {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px;
       padding: 40px;
     }
@@ -72,7 +86,6 @@
       text-align: center;
       box-shadow: 0 0 15px var(--crust);
       transition: all 0.3s ease;
-      cursor: pointer;
     }
 
     .file-card:hover {
@@ -84,10 +97,10 @@
       text-decoration: none;
       color: var(--blue);
       font-weight: bold;
-      font-size: 1.2em;
+      font-size: 1.1em;
+      word-break: break-all;
     }
 
-    /* Login Button */
     .login-btn {
       position: fixed;
       top: 20px;
@@ -108,7 +121,6 @@
       box-shadow: 0 0 20px var(--pink), 0 0 40px var(--lavender);
     }
 
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -156,44 +168,82 @@
       color: var(--crust);
       box-shadow: 0 0 10px var(--blue);
     }
+
+    .upload-form {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .upload-form input {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 6px;
+      border: none;
+      background: var(--mantle);
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
   <div class="cursor"></div>
 
-  <header>✨ Glowing File Directory ✨</header>
+  <header>Glowing File Directory</header>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search files...">
+    </div>
+    <div class="file-count" id="fileCount">Files: 1</div>
+  </div>
 
   <button class="login-btn">Login</button>
 
-  <div class="directory">
+  <div class="directory" id="directory">
     <div class="file-card">
-      <a href="https://example.com" target="_blank">📁 Placeholder File</a>
+      <a href="https://example.com" target="_blank">placeholder.txt</a>
     </div>
   </div>
 
   <!-- Modal -->
   <div class="modal" id="loginModal">
     <div class="modal-content">
-      <h2>🔑 Enter Password</h2>
+      <h2>Enter Password</h2>
       <input type="password" id="passwordInput" placeholder="Password" />
       <br>
       <button onclick="checkPassword()">Login</button>
       <p id="error" style="color: var(--red); display: none;">Wrong password!</p>
+      <div class="upload-form" id="uploadForm">
+        <h3>Upload File Link</h3>
+        <input type="text" id="filename" placeholder="filename.txt" />
+        <input type="text" id="filelink" placeholder="https://..." />
+        <button onclick="uploadFile()">Upload</button>
+        <p id="uploadError" style="color: var(--red); display:none;">Invalid file!</p>
+      </div>
     </div>
   </div>
 
   <script>
-    // Cursor
     const cursor = document.querySelector('.cursor');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+
     document.addEventListener('mousemove', e => {
-      cursor.style.left = e.pageX + 'px';
-      cursor.style.top = e.pageY + 'px';
+      mouseX = e.pageX;
+      mouseY = e.pageY;
     });
 
-    // Modal Logic
+    function animateCursor() {
+      cursorX += (mouseX - cursorX) * 0.1;
+      cursorY += (mouseY - cursorY) * 0.1;
+      cursor.style.transform = `translate(${cursorX - 7}px, ${cursorY - 7}px)`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
     const modal = document.getElementById('loginModal');
     const loginBtn = document.querySelector('.login-btn');
     const errorMsg = document.getElementById('error');
+    const uploadForm = document.getElementById('uploadForm');
 
     loginBtn.addEventListener('click', () => {
       modal.style.display = 'flex';
@@ -202,19 +252,57 @@
     function checkPassword() {
       const input = document.getElementById('passwordInput').value;
       if (input === 'v3aura') {
-        modal.style.display = 'none';
-        alert('🎉 Logged in successfully! You can now upload links (coming soon)');
+        errorMsg.style.display = 'none';
+        uploadForm.style.display = 'block';
       } else {
         errorMsg.style.display = 'block';
       }
     }
 
-    // Close modal on click outside
+    function uploadFile() {
+      const filename = document.getElementById('filename').value.trim();
+      const filelink = document.getElementById('filelink').value.trim();
+      const uploadError = document.getElementById('uploadError');
+
+      if (!/^[\w,\s-]+\.(txt|lua)$/i.test(filename)) {
+        uploadError.style.display = 'block';
+        return;
+      }
+      if (!filelink.startsWith('http')) {
+        uploadError.style.display = 'block';
+        return;
+      }
+
+      uploadError.style.display = 'none';
+      const dir = document.getElementById('directory');
+      const card = document.createElement('div');
+      card.classList.add('file-card');
+      card.innerHTML = `<a href="${filelink}" target="_blank">${filename}</a>`;
+      dir.appendChild(card);
+
+      updateFileCount();
+    }
+
+    function updateFileCount() {
+      const count = document.querySelectorAll('.file-card').length;
+      document.getElementById('fileCount').innerText = `Files: ${count}`;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+      const val = e.target.value.toLowerCase();
+      document.querySelectorAll('.file-card').forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(val) ? 'block' : 'none';
+      });
+    });
+
     window.onclick = function(e) {
       if (e.target === modal) {
         modal.style.display = 'none';
       }
     }
+
+    updateFileCount();
   </script>
 </body>
 </html>
