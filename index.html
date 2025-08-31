@@ -1,57 +1,220 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>What’s My IP — Rainbow</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glowing File Directory</title>
+  <style>
+    /* Catppuccin Mocha Palette */
+    :root {
+      --base: #1e1e2e;
+      --mantle: #181825;
+      --crust: #11111b;
+      --text: #cdd6f4;
+      --subtext: #a6adc8;
+      --blue: #89b4fa;
+      --lavender: #b4befe;
+      --mauve: #cba6f7;
+      --pink: #f5c2e7;
+      --red: #f38ba8;
+      --green: #a6e3a1;
+      --yellow: #f9e2af;
+    }
+
+    body {
+      background: var(--base);
+      font-family: 'Segoe UI', sans-serif;
+      color: var(--text);
+      margin: 0;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Glowing Cursor */
+    .cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--mauve);
+      box-shadow: 0 0 20px var(--mauve), 0 0 40px var(--pink);
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease-out;
+      z-index: 9999;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      font-size: 2em;
+      color: var(--lavender);
+      text-shadow: 0 0 15px var(--mauve);
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px var(--mauve), 0 0 20px var(--blue); }
+      to { text-shadow: 0 0 20px var(--pink), 0 0 40px var(--lavender); }
+    }
+
+    .directory {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 40px;
+    }
+
+    .file-card {
+      background: var(--mantle);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 15px var(--crust);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .file-card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 0 20px var(--lavender), 0 0 40px var(--pink);
+    }
+
+    .file-card a {
+      text-decoration: none;
+      color: var(--blue);
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    /* Login Button */
+    .login-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--mauve);
+      color: var(--crust);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 15px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--mauve);
+      transition: all 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background: var(--pink);
+      box-shadow: 0 0 20px var(--pink), 0 0 40px var(--lavender);
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: var(--mantle);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 0 20px var(--lavender), 0 0 40px var(--pink);
+      animation: fadeIn 0.5s;
+    }
+
+    .modal-content input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      margin-bottom: 10px;
+      width: 200px;
+      text-align: center;
+    }
+
+    .modal-content button {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      background: var(--blue);
+      color: var(--crust);
+      box-shadow: 0 0 10px var(--blue);
+    }
+  </style>
 </head>
 <body>
-  <!-- Decorative background -->
-  <div class="bg-orbs" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+  <div class="cursor"></div>
+
+  <header>✨ Glowing File Directory ✨</header>
+
+  <button class="login-btn">Login</button>
+
+  <div class="directory">
+    <div class="file-card">
+      <a href="https://example.com" target="_blank">📁 Placeholder File</a>
+    </div>
   </div>
 
-  <!-- Subtle grid -->
-  <div class="grid-overlay" aria-hidden="true"></div>
+  <!-- Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <h2>🔑 Enter Password</h2>
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <br>
+      <button onclick="checkPassword()">Login</button>
+      <p id="error" style="color: var(--red); display: none;">Wrong password!</p>
+    </div>
+  </div>
 
-  <main class="container">
-    <header class="brand">
-      <div class="logo">🌈</div>
-      <h1 class="title">Your IP</h1>
-    </header>
+  <script>
+    // Cursor
+    const cursor = document.querySelector('.cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.pageX + 'px';
+      cursor.style.top = e.pageY + 'px';
+    });
 
-    <section class="hero-card" role="region" aria-live="polite" aria-atomic="true">
-      <div id="ip" class="ip-text" data-placeholder="Fetching IP…">Fetching IP…</div>
-      <div class="subline">
-        Client-side only • No logging • Smooth as butter
-      </div>
-      <div class="controls">
-        <button id="copyBtn" class="btn" aria-label="Copy IP">Copy</button>
-        <button id="refreshBtn" class="btn ghost" aria-label="Refresh IP">Refresh</button>
-      </div>
-    </section>
+    // Modal Logic
+    const modal = document.getElementById('loginModal');
+    const loginBtn = document.querySelector('.login-btn');
+    const errorMsg = document.getElementById('error');
 
-    <footer class="footer">
-      <span>Built with love and tastefully over-engineered animations.</span>
-      <a href="#" id="privacyLink">Privacy</a>
-    </footer>
-  </main>
+    loginBtn.addEventListener('click', () => {
+      modal.style.display = 'flex';
+    });
 
-  <!-- Inline dialog for transparency -->
-  <dialog id="privacyDialog">
-    <h2>Privacy</h2>
-    <p>This page fetches your public IP from a public API and renders it locally in your browser. It does not send your IP anywhere.</p>
-    <form method="dialog">
-      <button class="btn">Close</button>
-    </form>
-  </dialog>
+    function checkPassword() {
+      const input = document.getElementById('passwordInput').value;
+      if (input === 'v3aura') {
+        modal.style.display = 'none';
+        alert('🎉 Logged in successfully! You can now upload links (coming soon)');
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    }
 
-  <script src="app.js" type="module"></script>
+    // Close modal on click outside
+    window.onclick = function(e) {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+  </script>
 </body>
 </html>
